@@ -1,0 +1,5 @@
+@"
+requirements-generated.txt
+__pycache__/
+*.pyc
+"@ | Out-File -FilePath .rsconnect_ignore -Encoding utf8

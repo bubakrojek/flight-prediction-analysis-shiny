@@ -1,0 +1,10 @@
+﻿shiny==1.6.3
+shinywidgets==0.8.1
+pandas==3.0.2
+pyarrow==24.0.0
+polars==1.40.1
+plotly==6.7.0
+faicons==0.2.2
+htmltools==0.7.0
+narwhals==2.22.0
+matplotlib==3.10.9
