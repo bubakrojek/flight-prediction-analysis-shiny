@@ -101,4 +101,3 @@ Prototype models for predicting flight delays live in `machine_learning/prototyp
 
 ## License
 
-TODO: add a license.
