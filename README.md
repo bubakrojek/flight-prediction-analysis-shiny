@@ -17,6 +17,29 @@ The dashboard (`dashboard/app.py`) is split into six tabs:
 | **Routes** | Flight-connection map (line thickness = traffic) and median departure/arrival delay of top airport pairs |
 | **Flight summary** | Visualisation of a single flight by flight number, date and airline |
 
+## Machine learning
+
+The `machine_learning/` folder contains notebooks for predicting whether a flight will arrive late (`prototyping.ipynb`; earlier experiments in `prototyping_old.ipynb`).
+
+**Problem definition**
+
+- Binary classification: `IS_DELAYED = 1` when `ARRIVAL_DELAY` > 15 minutes (the FAA standard for a delayed flight).
+- Only completed flights are used (cancelled and diverted flights are excluded) - about 5.7 million flights from 2015.
+- Class imbalance: ~17.8% of flights are delayed vs ~82.2% on time.
+
+**Data preparation**
+
+- No missing values in the selected subset.
+- Extreme outliers removed: arrival delays above the 99.9th percentile (368 min, ~0.1% of rows), which are rare and practically unpredictable.
+- Data-leakage prevention: columns known only after take-off or landing (`DEPARTURE_TIME`, `TAXI_OUT`, `WHEELS_OFF`, `AIR_TIME`, `ELAPSED_TIME`, `WHEELS_ON`, `TAXI_IN`, `ARRIVAL_TIME`) and delay-cause columns (`AIR_SYSTEM_DELAY`, `SECURITY_DELAY`, `AIRLINE_DELAY`, `LATE_AIRCRAFT_DELAY`, `WEATHER_DELAY`) are dropped.
+- High-cardinality `FLIGHT_NUMBER` is dropped; `TAIL_NUMBER`, `DEPARTURE_DELAY`, `SCHEDULED_DEPARTURE` and `SCHEDULED_ARRIVAL` are used only for feature engineering.
+
+**Input features**
+
+Month, day, day of week, airline, origin and destination airport, scheduled departure and arrival time, scheduled flight time and distance, plus engineered features.
+
+**Status:** model training and evaluation are work in progress - results will be added here.
+
 ## Tech stack
 
 - **App:** Shiny for Python, shinywidgets
@@ -25,41 +48,12 @@ The dashboard (`dashboard/app.py`) is split into six tabs:
 - **Data download:** kagglehub
 - **Deployment:** rsconnect-python, shinyapps.io
 
-## Project structure
-
-```
-.
-├── analysis/
-│   ├── preprocessing.ipynb      # data cleaning, conversion to parquet
-│   └── visualisation.ipynb      # exploratory visualisations
-├── machine_learning/
-│   ├── prototyping.ipynb        # delay-prediction models
-│   └── prototyping_old.ipynb    # earlier experiments
-├── dashboard/
-│   ├── app.py                   # Shiny app (UI + server)
-│   ├── utils/                   # data preprocessing and plotting helpers
-│   ├── data/                    # parquet files
-│   └── requirements.txt
-├── main.py                      # downloads datasets from Kaggle
-└── README.md
-```
-
 ## Data
 
 The project uses public Kaggle datasets:
 
 - [`usdot/flight-delays`](https://www.kaggle.com/datasets/usdot/flight-delays) - flights, airlines and airports (2015)
 - [`yuanyuwendymu/airline-delay-and-cancellation-data-2009-2018`](https://www.kaggle.com/datasets/yuanyuwendymu/airline-delay-and-cancellation-data-2009-2018)
-
-The app expects the following files in `dashboard/data/`:
-
-```
-flights.parquet
-airlines.parquet
-airports.parquet
-```
-
-Run `analysis/preprocessing.ipynb` to generate them from the raw CSV files.
 
 ## Getting started
 
@@ -94,10 +88,6 @@ To redeploy:
 ```bash
 rsconnect deploy shiny dashboard/ --name <account> --title flights-analysis1
 ```
-
-## Machine learning
-
-Prototype models for predicting flight delays live in `machine_learning/prototyping.ipynb`.
 
 ## License
 
